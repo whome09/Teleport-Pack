@@ -1,273 +1,211 @@
 # TeleportPack Plugin Wiki
 
-TeleportPack is a comprehensive teleportation plugin for Minecraft servers running on Bukkit/Spigot/Paper. It offers a wide range of features including multi-world teleportation, random teleportation, economy integration, PlaceholderAPI conditions, customizable effects, and world-specific respawn points.
+## Overview
 
-------
+TeleportPack is a powerful multi-world teleportation plugin that provides the following core features:
 
-## Features
-
-- **Multi-World Teleportation** - Seamlessly teleport between different worlds.
-- **Random Teleportation** - Configurable range and terrain restrictions for random teleports.
-- **Back/Return System** - Return to your previous location, whether in the same world or a different one.
-- **Economy Support** - Set costs for teleportation (requires the Vault plugin).
-- **PlaceholderAPI Conditions** - Define custom conditions for teleportation.
-- **Visual Effects** - Particle effects, sounds, and title displays during teleportation.
-- **Custom Respawn Points** - Set default respawn locations for each world.
-- **Cooldown System** - Prevent excessive teleportation with cooldowns.
-- **Movement Detection** - Automatically cancel teleportation if the player moves during the countdown.
-- **Highly Configurable** - Customize all features in detail via the configuration file.
-
-------
+- Precise coordinate teleportation
+- Random safe location teleportation
+- Return to last position
+- Cross-world return
+- Intelligent fallback teleportation
+- Custom respawn points
+- Economic system integration
+- Rich visual effects
 
 ## Installation Guide
 
-1. **Download** the latest version of TeleportPack.jar.
-2. Place the jar file into your server’s plugins folder.
-3. Install dependency plugins (optional but recommended):
-   - [Vault](https://www.spigotmc.org/resources/vault.34315/) - For economy functionality.
-   - [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) - For advanced condition support.
-4. **Restart** your server.
-5. Edit the plugins/TeleportPack/config.yml file to configure the plugin as needed.
+### Basic Installation
 
-------
+1. Place the plugin JAR file into the server's plugins folder
+2. Restart the server
+3. Configuration files will be automatically generated on first run
+4. Modify config.yml as needed
 
-## Commands
+### Dependency Plugins
+
+- **Required**: None
+
+- Recommended
+
+  :
+
+  - Vault (for economic system)
+  - PlaceholderAPI (for condition checks)
+
+## Command List
 
 | Command     | Description                                    | Usage                                         | Permission                   |
 | :---------- | :--------------------------------------------- | :-------------------------------------------- | :--------------------------- |
-| /tp         | Teleport to a specific world and coordinates   | /tp <world> <x> <y> <z>                       | teleportpack.tp              |
-| /rtp        | Random teleport                                | /rtp [world]                                  | teleportpack.rtp             |
-| /back       | Return to the previous location (same world)   | /back                                         | teleportpack.back.use        |
-| /backworld  | Return to a previous location in another world | /backworld <world>                            | teleportpack.back.crossworld |
-| /setrespawn | Set the respawn point for a world              | /setrespawn <world> [x] [y] [z] [yaw] [pitch] | teleportpack.admin           |
-| /tpreload   | Reload the TeleportPack configuration          | /tpreload                                     | teleportpack.admin           |
+| /tp         | Teleport to specified coordinates              | /tp <world> <x> <y> <z></z></y></x></world>   | teleportpack.tp              |
+| /rtp        | Random teleport                                | /rtp                                          | teleportpack.rtp             |
+| /back       | Return to last position in the same world      | /back                                         | teleportpack.back.use        |
+| /backworld  | Return to last position in specified world     | /backworld <world></world>                    | teleportpack.back.crossworld |
+| /smartback  | Intelligent return (prioritize world position) | /smartback                                    | teleportpack.smartback       |
+| /setrespawn | Set world respawn point                        | /setrespawn <world> [x y z yaw pitch]</world> | teleportpack.admin           |
+| /tpreload   | Reload configuration                           | /tpreload                                     | teleportpack.admin           |
 
-------
+## Permission Nodes
 
-## Permissions
+| Permission Node              | Description               | Default |
+| :--------------------------- | :------------------------ | :------ |
+| teleportpack.*               | All permissions           | op      |
+| teleportpack.tp              | Use /tp command           | true    |
+| teleportpack.rtp             | Use /rtp command          | true    |
+| teleportpack.back.use        | Use /back command         | true    |
+| teleportpack.back.crossworld | Use /backworld command    | true    |
+| teleportpack.smartback       | Use /smartback command    | op      |
+| teleportpack.respawn         | Use custom respawn points | true    |
+| teleportpack.admin           | Admin commands            | op      |
+| teleportpack.bypass.cost     | Bypass teleport costs     | false   |
+| teleportpack.bypass.cooldown | Bypass cooldown times     | false   |
 
-| Permission Node              | Description                                    | Default |
-| :--------------------------- | :--------------------------------------------- | :------ |
-| teleportpack.*               | Access to all TeleportPack permissions         | op      |
-| teleportpack.tp              | Use the /tp command                            | true    |
-| teleportpack.rtp             | Use the /rtp command                           | true    |
-| teleportpack.back.use        | Use the /back command                          | true    |
-| teleportpack.back.crossworld | Use the /backworld command                     | true    |
-| teleportpack.respawn         | Use custom respawn points                      | true    |
-| teleportpack.admin           | Access admin commands (/setrespawn, /tpreload) | op      |
-| teleportpack.bypass.cost     | Bypass teleportation costs                     | false   |
-| teleportpack.bypass.cooldown | Bypass teleportation cooldowns                 | false   |
+## Configuration Details
 
-------
-
-## Configuration Guide
-
-The main configuration file is located at plugins/TeleportPack/config.yml. All messages and settings are fully customizable.
-
-### Teleport Settings
-
-yaml
+### Basic Configuration (config.yml)
 
 ```
 teleport:
-  delay: 3                    # Teleport delay in seconds
-  allow-movement: false       # Allow movement during countdown
-  cooldown: 10                # Cooldown between teleports (seconds)
+  delay: 3               # Teleport delay (seconds)
+  allow-movement: false  # Whether to allow movement during teleport
+  cooldown: 10           # Global cooldown time (seconds)
+  
+  # Title settings
   title:
-    enabled: true             # Enable title display during teleport
-    main: "&aTeleporting!"    # Main title text
-    sub: "&7Please wait {countdown} seconds..." # Subtitle text, {countdown} is replaced with seconds
-    fadeIn: 10                # Fade-in time (ticks, 1 second = 20 ticks)
-    stay: 40                  # Display duration (ticks)
-    fadeOut: 10               # Fade-out time (ticks)
+    enabled: true
+    main: "&aTeleporting!"
+    sub: "&7Please wait {countdown} seconds..."
+  
+  # Particle effects
   particles:
-    enabled: true             # Enable particle effects
-    type: PORTAL              # Particle type (e.g., PORTAL, END_ROD, FLAME)
-    count: 50                 # Number of particles
+    enabled: true
+    type: PORTAL         # Particle type
+    count: 50            # Particle count
+  
+  # Sound effects
   sounds:
-    enabled: true             # Enable sound effects
-    start: BLOCK_PORTAL_TRIGGER # Sound played when teleport starts
-    complete: ENTITY_ENDERMAN_TELEPORT # Sound played when teleport completes
+    enabled: true
+    start: BLOCK_PORTAL_TRIGGER      # Start sound
+    complete: ENTITY_ENDERMAN_TELEPORT # Complete sound
 ```
 
-### Random Teleport
-
-Random teleport settings can be configured per world:
-
-yaml
+### Random Teleport Configuration
 
 ```
 random-teleport:
+  target-world: world    # Default target world
+  max-attempts: 20       # Maximum attempts
+  safe-check: true       # Whether to check for safe locations
+  
+  # World-specific settings
   worlds:
-    world:                    # World name
-      enabled: true           # Enable random teleport in this world
-      min-range: 100          # Minimum distance from spawn
-      max-range: 5000         # Maximum distance from spawn
+    world:
+      enabled: true
+      min-range: 100     # Minimum range
+      max-range: 5000    # Maximum range
+      
+      # Fixed height settings
       fixed-height:
-        enabled: false        # Use a fixed height instead of finding the highest block
-        min-y: 60             # Minimum Y coordinate
-        max-y: 100            # Maximum Y coordinate
+        enabled: false
+        min-y: 60
+        max-y: 100
+      
+      # Terrain restrictions
       terrain:
-        allow-water: false    # Allow teleporting onto water
-        allow-lava: false     # Allow teleporting onto lava
-        allowed-blocks:       # Only allow teleporting onto these blocks (empty = all allowed)
+        allow-water: false
+        allow-lava: false
+        allowed-blocks:  # Allowed landing blocks
           - GRASS_BLOCK
           - DIRT
-          - STONE
-          - SAND
-        forbidden-blocks:     # Never allow teleporting onto these blocks
+        forbidden-blocks: # Forbidden landing blocks
           - CACTUS
-          - MAGMA_BLOCK
-      excluded-biomes:        # Biomes where teleportation is disabled
+      
+      # Excluded biomes
+      excluded-biomes:
         - OCEAN
-        - DEEP_OCEAN
-  max-attempts: 20            # Maximum attempts to find a safe location
-  safe-check: true            # Enable safe location checking
 ```
 
-### Economy and Conditions
-
-Set costs and conditions for each teleport type:
-
-yaml
-
-```
-costs:
-  enabled: true               # Enable economy system (requires Vault)
-  tp:
-    money: 100                # Cost for /tp command
-    conditions:               # PlaceholderAPI conditions
-      - "%player_level% >= 10"
-    condition-messages:       # Messages shown when conditions aren’t met
-      - "&cYou need at least level 10 to use this command!"
-  rtp:
-    money: 50                 # Cost for /rtp command
-    conditions: []
-    condition-messages: []
-  back:
-    money: 200                # Cost for /back command
-    conditions: []
-    condition-messages: []
-```
-
-### Back/Return Settings
-
-yaml
+### Return System Configuration
 
 ```
 back:
-  enabled: true               # Enable the /back command
-  allow-in-same-world: true   # Allow returning to the previous location in the same world
-  allow-cross-world: true     # Allow returning to a previous location in another world
-  expire-time: 600            # Time before the back location expires (seconds)
-  clear-on-death: true        # Clear the back location on player death
-  cross-world-extra-cost: 100 # Additional cost for cross-world returns
+  enabled: true
+  allow-in-same-world: true    # Allow same-world return
+  allow-cross-world: true      # Allow cross-world return
+  expire-time: 600             # Location record expiration time (seconds)
+  clear-on-death: true         # Clear records on death
+  cross-world-extra-cost: 100  # Extra cost for cross-world
 ```
 
-### Respawn Settings
-
-yaml
+### Economic System Configuration
 
 ```
-respawn:
-  enabled: true               # Enable custom respawn points
-  worlds:                     # Define respawn points per world
-    world:
-      x: 0
-      y: 80
-      z: 0
-      yaw: 0
-      pitch: 0
-    world_nether:             # Example: Respawn point for the Nether
-      x: 0
-      y: 70
-      z: 0
-      yaw: 0
-      pitch: 0
+costs:
+  enabled: true
+  tp:
+    money: 100    # Normal teleport cost
+    conditions:   # Usage conditions
+      - "%player_level% >= 10"
+    condition-messages: # Messages for unmet conditions
+      - "&cYou need at least level 10!"
 ```
 
-**Note**: Coordinates can be set in-game using the /setrespawn command.
-
-### Messages
-
-All messages are customizable in the messages section and support & color codes:
-
-yaml
+### Intelligent Fallback Command Configuration
 
 ```
-messages:
-  prefix: "&6[TeleportPack] &r"
-  teleporting: "&aTeleporting... &e{countdown} &aseconds."
-  teleport-success: "&aTeleport successful!"
-  teleport-cancelled: "&cTeleport cancelled!"
-  no-permission: "&cYou do not have permission!"
-  # Additional messages can be found in config.yml
+fork-command:
+  enabled: true
+  command-name: "smartback"
+  permission: "teleportpack.smartback"
+  primary-cmd: "backworld world"  # Primary command
+  fallback-cmd: "rtp"             # Fallback command
+  messages:
+    executing-primary: "&aReturning to your previous location!"
+    executing-fallback: "&aNo previous location, random teleporting!"
 ```
 
-------
+## Feature Highlights
 
-## PlaceholderAPI Support
+### 1. Intelligent Location Recording
 
-TeleportPack integrates with PlaceholderAPI for advanced condition checks. Use any placeholder in the conditions section.
+- Automatically records the player's last position in each world
+- Configurable expiration time
+- Optional clearing of records on death
 
-**Examples:**
+### 2. Safe Random Teleport
 
-- %player_level% >= 10 - Requires player level 10 or higher.
-- %player_health% > 5 - Requires health above 5.
-- %player_world% == world - Restricts usage to the world world.
-- %vault_eco_balance% >= 1000 - Requires a minimum balance of 1000.
+- Intelligent detection of safe landing points
+- Configurable teleport range
+- Biome and block filtering
 
-**Supported Operators:** >, <, >=, <=, ==
+### 3. Complete Economic System
 
-------
+- Supports Vault economy
+- Independent costs for each teleport type
+- Usage condition checks
 
-## FAQ
+### 4. Visual Effects
 
-**Q: Why isn’t the economy system working?**
- A: Ensure Vault and an economy plugin (e.g., EssentialsX or CMI) are installed and loaded before TeleportPack.
+- Configurable particle effects
+- Teleport progress titles
+- Custom sound effects
 
-**Q: Can I disable the title during teleportation?**
- A: Yes, set enabled to false in the teleport.title section.
+## Common Issues
 
-**Q: Why do players teleport to unsafe locations?**
- A: Enable random-teleport.safe-check: true and configure the random-teleport.worlds.<world>.terrain section to define allowed or forbidden blocks.
+**Q: Why does random teleport fail?** A: Possible reasons:
 
-**Q: How do I add more worlds for random teleportation?**
- A: Duplicate an existing world entry in random-teleport.worlds, update the world name, and adjust the settings as needed.
+1. No safe location found (try increasing max-attempts)
+2. Target world not enabled (check worlds.<world>.enabled)</world>
+3. Player does not meet conditions (check costs.rtp.conditions)
 
-**Q: Why doesn’t teleportation cancel when players move during the countdown?**
- A: Verify that teleport.allow-movement is set to false. High server latency may cause detection delays.
+**Q: How to reset a player's cooldown time?** A: Admins can use the command:
 
-------
+```
+/plugman reload TeleportPack
+```
 
-## Troubleshooting
+**Q: Why isn't the custom respawn point working?** A: Ensure:
 
-### "No economy plugin found"
-
-- Install Vault and an economy plugin.
-- Ensure they load before TeleportPack (check the plugin load order).
-
-### "Cannot find a safe location"
-
-- Increase random-teleport.max-attempts.
-- Review allowed-blocks and forbidden-blocks settings for reasonableness.
-- Ensure the world has sufficient safe teleportation areas.
-
-### PlaceholderAPI conditions not working
-
-- Confirm PlaceholderAPI is installed.
-- Use /papi list to verify the placeholder exists.
-- Check the condition syntax for errors.
-
-------
-
-## Support
-
-For bug reports, feature requests, or assistance:
-
-- Submit an issue on GitHub.
-- Contact the plugin author.
-- Regularly check for updates to access new features and fixes.
-
-**Version:** 1.0.3-Beta
- **API:** Bukkit/Spigot/Paper 1.13+
+1. respawn.enabled is set to true
+2. Player has teleportpack.respawn permission
+3. Not respawning at bed or respawn anchor
